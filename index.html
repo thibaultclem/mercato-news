@@ -1,12 +1,13 @@
-<html>
+<!-- Include https://github.com/angular-ui/AngularJS-Atom snippet shortcuts -->
+<html> <!-- ngindex -->
   <head>
     <title>Mercato News</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
     <script type="text/javascript" src="app.js"></script>
   </head>
   <body ng-app="mercatoNews" ng-controller="MainCtrl">
-    <div>
-      {{test}}
+    <div ng-repeat="rumor in rumors | orderBy: '-upvotes'">
+      {{rumor.title}} - upvotes: {{rumor.upvotes}}
     </div>
   </body>
 </html>
