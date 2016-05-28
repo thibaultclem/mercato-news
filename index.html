@@ -9,5 +9,9 @@
     <div ng-repeat="rumor in rumors | orderBy: '-upvotes'">
       {{rumor.title}} - upvotes: {{rumor.upvotes}}
     </div>
+    <form ng-submit="addRumor()">
+      <input type="text" ng-model="title" value="">
+      <button type="submit">Post</button>
+    </form>
   </body>
 </html>

@@ -13,5 +13,10 @@ app.controller('MainCtrl', [
       {title: 'Pogba in Bayern', upvotes: 7},
       {title: 'Kante in Manchester', upvotes: 5}
     ];
+    $scope.addRumor = function() { //ngf
+      if (!$scope.title || $scope.title === '') { return; }//prevent blank title post by user
+      $scope.rumors.push({title: $scope.title, upvotes: 0});
+      $scope.title = '' //blank title input once it has been added to the posts array
+    };
   }
 ])
