@@ -7,6 +7,7 @@
   </head>
   <body ng-app="mercatoNews" ng-controller="MainCtrl">
     <div ng-repeat="rumor in rumors | orderBy: '-upvotes'">
+      <span ng-click="upvoteRumor(rumor)">^</span>
       {{rumor.title}} - upvotes: {{rumor.upvotes}}
     </div>
     <form ng-submit="addRumor()">

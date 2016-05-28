@@ -18,5 +18,8 @@ app.controller('MainCtrl', [
       $scope.rumors.push({title: $scope.title, upvotes: 0});
       $scope.title = '' //blank title input once it has been added to the posts array
     };
+    $scope.upvoteRumor = function(post) {
+      post.upvotes += 1
+    };
   }
 ])
