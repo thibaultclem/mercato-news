@@ -1,27 +1,46 @@
 <!-- Include https://github.com/angular-ui/AngularJS-Atom snippet shortcuts -->
 <html> <!-- ngindex -->
-  <head>
-    <title>Mercato News</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
-    <script type="text/javascript" src="app.js"></script>
-  </head>
-  <body ng-app="mercatoNews" ng-controller="MainCtrl">
-    <div ng-repeat="rumor in rumors | orderBy: '-upvotes'">
-      <span ng-click="upvoteRumor(rumor)">^</span>
-      <a ng-show="rumor.link" href="{{rumor.link}}">
-        {{rumor.title}}
-      </a>
-      <span ng-hide="rumor.link">
-        {{rumor.title}}
-      </span>
-      - upvotes: {{rumor.upvotes}}
+<head>
+  <title>Mercato News</title>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+  <script type="text/javascript" src="app.js"></script>
+</head>
+<body ng-app="mercatoNews" ng-controller="MainCtrl">
+
+  <div class="container">
+    <div class="col-md-6 col-md-offset-3">
+
+      <div class="page-header">
+        <h1>Mercato News</h1>
+      </div>
+
+      <div ng-repeat="rumor in rumors | orderBy: '-upvotes'" style="font-size:20px; margin-left:10px;">
+        <span class="glyphicon glyphicon-thumbs-up" ng-click="upvoteRumor(rumor)"></span>
+        {{rumor.upvotes}}
+        <a ng-show="rumor.link" href="{{rumor.link}}">
+          {{rumor.title}}
+        </a>
+        <span ng-hide="rumor.link">
+          {{rumor.title}}
+        </span>
+      </div>
+
+      <div style="font-size:20px;; margin-top:30px;">
+        Post a new rumor
+      </div>
+      <form ng-submit="addRumor()" style="font-size:20px;; margin-top:10px;">
+        <div class="form-group">
+          <input type="text" placeholder="title" class="form-control" ng-model="title" value="">
+        </div>
+        <div class="form-group">
+          <input type="text" placeholder="link" class="form-control" ng-model="link" value="">
+        </div>
+        <button type="submit" class="btn btn-primary">Post</button>
+      </form>
+
     </div>
-    <form ng-submit="addRumor()">
-      <input type="text" placeholder="title" ng-model="title" value="">
-      <br />
-      <input type="text" placeholder="link" ng-model="link" value="">
-      <br />
-      <button type="submit">Post</button>
-    </form>
-  </body>
+  </div>
+
+</body>
 </html>
