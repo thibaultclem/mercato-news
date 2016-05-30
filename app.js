@@ -1,6 +1,6 @@
 //Include https://github.com/angular-ui/AngularJS-Atom snippet shortcuts
 
-var app = angular.module('mercatoNews', []) //ngma
+var app = angular.module('mercatoNews', ['ui.router']) //ngma
 
 app.controller('MainCtrl', [
   '$scope',
