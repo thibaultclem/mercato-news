@@ -44,7 +44,7 @@ app.config([
 
     $stateProvider.state('home', {
       url: '/home',
-      templateUrl: '/home.html',
+      templateUrl: 'template/home.html',
       controller: 'MainCtrl'
     });
 

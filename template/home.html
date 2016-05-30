@@ -1,0 +1,27 @@
+<div class="page-header">
+  <h1>Mercato News</h1>
+</div>
+
+<div ng-repeat="rumor in rumors | orderBy: '-upvotes'" style="font-size:20px; margin-left:10px;">
+  <span class="glyphicon glyphicon-thumbs-up" ng-click="upvoteRumor(rumor)"></span>
+  {{rumor.upvotes}}
+  <a ng-show="rumor.link" href="{{rumor.link}}">
+    {{rumor.title}}
+  </a>
+  <span ng-hide="rumor.link">
+    {{rumor.title}}
+  </span>
+</div>
+
+<div style="font-size:20px;; margin-top:30px;">
+  Post a new rumor
+</div>
+<form ng-submit="addRumor()" style="font-size:20px;; margin-top:10px;">
+  <div class="form-group">
+    <input type="text" placeholder="title" class="form-control" ng-model="title" value="">
+  </div>
+  <div class="form-group">
+    <input type="text" placeholder="link" class="form-control" ng-model="link" value="">
+  </div>
+  <button type="submit" class="btn btn-primary">Post</button>
+</form>
