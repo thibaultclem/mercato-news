@@ -24,6 +24,15 @@ app.controller('MainCtrl', [
   }
 ])
 
+app.controller('RumorCtrl', [
+  '$scope',
+  '$stateParams'
+  'rumors',
+  function ($scope, $stateParams, rumors) {
+    
+  }
+])
+
 app.factory('rumors', [function() {
   var o = {
     rumors: [
@@ -42,10 +51,16 @@ app.config([
   '$urlRouterProvider',
   function ($stateProvider, $urlRouterProvider) {
 
-    $stateProvider.state('home', {
+    $stateProvider
+    .state('home', {
       url: '/home',
       templateUrl: 'template/home.html',
       controller: 'MainCtrl'
+    })
+    .state('home', {
+      url: '/rumor/{id}',
+      templateUrl: 'template/rumor.html',
+      controller: 'RumorCtrl'
     });
 
     $urlRouterProvider.otherwise('home')
