@@ -11,12 +11,13 @@
   <span ng-hide="rumor.link">
     {{rumor.title}}
   </span>
+  <span style="font-size:15px;">
+  <a class="glyphicon glyphicon-comment" href="#/rumors/{{$index}}"></a>
+</span>
 </div>
 
-<div style="font-size:20px;; margin-top:30px;">
-  Post a new rumor
-</div>
-<form ng-submit="addRumor()" style="font-size:20px;; margin-top:10px;">
+<form ng-submit="addRumor()" style="font-size:20px; margin-top:10px;">
+  <h3>Post a new rumor</h3>
   <div class="form-group">
     <input type="text" placeholder="title" class="form-control" ng-model="title" value="">
   </div>
