@@ -1,86 +1,59 @@
-//Include https://github.com/angular-ui/AngularJS-Atom snippet shortcuts
+var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 
-var app = angular.module('mercatoNews', ['ui.router']); //ngma
+var routes = require('./routes/index');
+var users = require('./routes/users');
 
-app.controller('MainCtrl', [
-  '$scope',
-  'rumors',
-  function($scope, rumors) { //ngdlf
+var app = express();
 
-    $scope.test = "Hello world !"; //ngv
-    $scope.rumors = rumors.rumors;
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-    $scope.addRumor = function() { //ngf
-      if (!$scope.title || $scope.title === '') { return; }//prevent blank title post by user
-      $scope.rumors.push({
-        title: $scope.title,
-        link: $scope.link,
-        upvotes: 0,
-        comments: []
-      });
-      $scope.title = '' //blank title input once it has been added to the posts array
-      $scope.link = ''
-    };
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-    $scope.upvoteRumor = function(post) {
-      post.upvotes += 1
-    };
+app.use('/', routes);
+app.use('/users', users);
 
-  }
-]);
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
 
-app.controller('RumorsCtrl', [
-  '$scope',
-  '$stateParams',
-  'rumors',
-  function ($scope, $stateParams, rumors) {
+// error handlers
 
-    $scope.rumor = rumors.rumors[$stateParams.id];
-
-    $scope.addComment = function() {
-      if($scope.body === '') { return; }
-      $scope.rumor.comments.push({
-        author: 'user',
-        body: $scope.body,
-        upvotes: 0
-      });
-      $scope.body = ''
-    };
-
-  }
-]);
-
-app.factory('rumors', [function() {
-  var o = {
-    rumors: [
-      {title: 'Ibrahimovic in Arsenal', link: 'http://metro.co.uk/2016/04/28/arsenal-to-offer-two-year-contract-to-seal-transfer-of-zlatan-ibrahimovic-5846727/', upvotes: 5, comments: []},
-      {title: 'Neymar in Paris Saint Germain', link: 'http://www.mercatoparis.fr/neymar-psg', upvotes: 2, comments: []},
-      {title: 'Messi in FC Nantes', upvotes: 14, comments: []},
-      {title: 'Pogba in Bayern', upvotes: 7, comments: []},
-      {title: 'Kante in Manchester', link: 'https://www.theguardian.com/football/2016/may/26/football-transfer-rumours-manchester-united-ngolo-kante', upvotes: 11, comments: []}
-    ]
-  };
-  return o;
-}]);
-
-app.config([
-  '$stateProvider',
-  '$urlRouterProvider',
-  function ($stateProvider, $urlRouterProvider) {
-
-    $stateProvider
-    .state('home', {
-      url: '/home',
-      templateUrl: 'template/home.html',
-      controller: 'MainCtrl'
-    })
-    .state('rumors', {
-      url: '/rumors/{id}',
-      templateUrl: 'template/rumors.html',
-      controller: 'RumorsCtrl'
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+      message: err.message,
+      error: err
     });
+  });
+}
 
-    $urlRouterProvider.otherwise('home')
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: {}
+  });
+});
 
-  }
-]);
+module.exports = app;
