@@ -58,6 +58,9 @@ app.use(function(err, req, res, next) {
 
 //MongoDB connection with mongoose
 var mongoose = require('mongoose');
+require('./models/Rumors');
+require('./models/comments');
+
 mongoose.connect('mongodb://localhost/rumors');
 
 module.exports = app;
