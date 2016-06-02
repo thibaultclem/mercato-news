@@ -7,4 +7,9 @@ var RumorSchema = new mongoose.Schema({
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
 });
 
+RumorSchema.methods.upvote = function(cb) {
+  this.upvotes += 1;
+  this.save(cb);
+};
+
 mongoose.model('Rumor', RumorSchema);

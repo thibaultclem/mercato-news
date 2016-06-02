@@ -17,7 +17,7 @@ router.get('/rumors', function(req, res, next) {
     if(err) { return next(err); }
 
     res.json(rumors);
-})
+  })
 });
 
 /* POST rumor. */
@@ -26,6 +26,34 @@ router.post('/rumors', function(req, res, next) {
 
   rumor.save(function(err, rumor){
     if(err){ return next(err); }
+
+    res.json(rumor);
+  });
+});
+
+/* rumor PARAM */
+router.param('rumor', function(req, res, next, id) {
+  var query = Rumor.findById(id);
+
+  query.exec(function (err, rumor){
+    if (err) { return next(err); }
+    if (!rumor) { return next(new Error('can\'t find rumor')); }
+
+    req.rumor = rumor;
+    return next();
+  });
+});
+
+/* GET rumor */
+router.get('/rumors/:rumor', function(req, res) {
+  res.json(req.rumor);
+});
+
+
+/* PUT upvote rumor */
+router.put('/rumors/:rumor/upvote', function(req, res, next) {
+  req.rumor.upvote(function(err, rumor){
+    if (err) { return next(err); }
 
     res.json(rumor);
   });
