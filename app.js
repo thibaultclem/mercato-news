@@ -5,6 +5,13 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+//MongoDB connection with mongoose
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/rumors');
+//Load models
+require('./models/Rumors');
+require('./models/Comments');
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -55,12 +62,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
-//MongoDB connection with mongoose
-var mongoose = require('mongoose');
-require('./models/Rumors');
-require('./models/comments');
-
-mongoose.connect('mongodb://localhost/rumors');
 
 module.exports = app;
