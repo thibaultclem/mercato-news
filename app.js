@@ -56,4 +56,8 @@ app.use(function(err, req, res, next) {
   });
 });
 
+//MongoDB connection with mongoose
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/rumors');
+
 module.exports = app;
