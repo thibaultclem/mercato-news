@@ -12,18 +12,16 @@ app.controller('MainCtrl', [
 
     $scope.addRumor = function() { //ngf
       if (!$scope.title || $scope.title === '') { return; }//prevent blank title post by user
-      $scope.rumors.push({
+      rumors.create({
         title: $scope.title,
-        link: $scope.link,
-        upvotes: 0,
-        comments: []
+        link: $scope.link
       });
       $scope.title = '' //blank title input once it has been added to the posts array
       $scope.link = ''
     };
 
-    $scope.upvoteRumor = function(post) {
-      post.upvotes += 1
+    $scope.upvoteRumor = function(rumor) {
+      rumors.upvote(rumor);
     };
 
   }
@@ -31,35 +29,69 @@ app.controller('MainCtrl', [
 
 app.controller('RumorsCtrl', [
   '$scope',
-  '$stateParams',
   'rumors',
-  function ($scope, $stateParams, rumors) {
+  'rumor',
+  function ($scope, rumors, rumor) {
 
-    $scope.rumor = rumors.rumors[$stateParams.id];
+    $scope.rumor = rumor;
 
     $scope.addComment = function() {
       if($scope.body === '') { return; }
-      $scope.rumor.comments.push({
+      rumors.addComment(rumor._id, {
         author: 'user',
-        body: $scope.body,
-        upvotes: 0
+        body: $scope.body
+      }).success(function(comment){
+        $scope.rumor.comments.push(comment);
       });
       $scope.body = ''
+    };
+
+    $scope.upvoteComment = function(comment) {
+      rumors.upvoteComment(rumor, comment);
     };
 
   }
 ]);
 
-app.factory('rumors', [function() {
+app.factory('rumors', ['$http', function($http) {
   var o = {
-    rumors: [
-      {title: 'Ibrahimovic in Arsenal', link: 'http://metro.co.uk/2016/04/28/arsenal-to-offer-two-year-contract-to-seal-transfer-of-zlatan-ibrahimovic-5846727/', upvotes: 5, comments: []},
-      {title: 'Neymar in Paris Saint Germain', link: 'http://www.mercatoparis.fr/neymar-psg', upvotes: 2, comments: []},
-      {title: 'Messi in FC Nantes', upvotes: 14, comments: []},
-      {title: 'Pogba in Bayern', upvotes: 7, comments: []},
-      {title: 'Kante in Manchester', link: 'https://www.theguardian.com/football/2016/may/26/football-transfer-rumours-manchester-united-ngolo-kante', upvotes: 11, comments: []}
-    ]
+    rumors: []
   };
+
+  o.getAll = function() {
+    return $http.get('/rumors').success(function(data){
+      angular.copy(data, o.rumors);
+    });
+  };
+
+  o.get = function(id) {
+  return $http.get('/rumors/' + id).then(function(res){
+    return res.data;
+  });
+};
+
+  o.create = function(rumor) {
+    return $http.post('/rumors', rumor).success(function(data){
+      o.rumors.push(data);
+    });
+  };
+
+  o.upvote = function(rumor) {
+    return $http.put('/rumors/' + rumor._id + '/upvote').success(function(data){
+      rumor.upvotes += 1;
+    });
+  };
+
+  o.addComment = function(id, comment) {
+  return $http.post('/rumors/' + id + '/comments', comment);
+};
+
+o.upvoteComment = function(rumor, comment) {
+  return $http.put('/rumors/' + rumor._id + '/comments/' + comment._id + '/upvote').success(function(data){
+    comment.upvotes += 1;
+  });
+};
+
   return o;
 }]);
 
@@ -72,12 +104,22 @@ app.config([
     .state('home', {
       url: '/home',
       templateUrl: '../templates/home.html',
-      controller: 'MainCtrl'
+      controller: 'MainCtrl',
+      resolve: {
+        rumorPromise: ['rumors', function(rumors){
+          return rumors.getAll();
+        }]
+      }
     })
     .state('rumors', {
       url: '/rumors/{id}',
       templateUrl: '../templates/rumors.html',
-      controller: 'RumorsCtrl'
+      controller: 'RumorsCtrl',
+  resolve: {
+    rumor: ['$stateParams', 'rumors', function($stateParams, rumors) {
+      return rumors.get($stateParams.id);
+    }]
+  }
     });
 
     $urlRouterProvider.otherwise('home')

@@ -1,5 +1,6 @@
 <div class="page-header">
     <h3>
+      <a class="glyphicon glyphicon-chevron-left" href="/"></a>
       <a ng-show="rumor.link" href="{{rumor.link}}">
         {{rumor.title}}
       </a>
@@ -12,7 +13,7 @@
 
   <div ng-repeat="comment in rumor.comments | orderBy:'-upvotes'">
     <span class="glyphicon glyphicon-thumbs-up"
-      ng-click="incrementUpvotes(comment)"></span>
+      ng-click="upvoteComment(comment)"></span>
     {{comment.upvotes}} - by {{comment.author}}
     <span style="font-size:20px; margin-left:10px;">
       {{comment.body}}
