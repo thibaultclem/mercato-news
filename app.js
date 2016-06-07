@@ -4,13 +4,19 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+var passport = require('passport');
 
 //MongoDB connection with mongoose
-var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/rumors');
-//Load models
+
+//Models
 require('./models/Rumors');
 require('./models/Comments');
+require('./models/Users');
+
+//Auhtentication
+require('./config/passport');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -62,5 +68,8 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
+
+//Passeport authentication
+app.use(passport.initialize());
 
 module.exports = app;
