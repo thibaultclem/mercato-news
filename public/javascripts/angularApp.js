@@ -65,10 +65,10 @@ app.factory('rumors', ['$http', function($http) {
   };
 
   o.get = function(id) {
-  return $http.get('/rumors/' + id).then(function(res){
-    return res.data;
-  });
-};
+    return $http.get('/rumors/' + id).then(function(res){
+      return res.data;
+    });
+  };
 
   o.create = function(rumor) {
     return $http.post('/rumors', rumor).success(function(data){
@@ -83,17 +83,68 @@ app.factory('rumors', ['$http', function($http) {
   };
 
   o.addComment = function(id, comment) {
-  return $http.post('/rumors/' + id + '/comments', comment);
-};
+    return $http.post('/rumors/' + id + '/comments', comment);
+  };
 
-o.upvoteComment = function(rumor, comment) {
-  return $http.put('/rumors/' + rumor._id + '/comments/' + comment._id + '/upvote').success(function(data){
-    comment.upvotes += 1;
-  });
-};
+  o.upvoteComment = function(rumor, comment) {
+    return $http.put('/rumors/' + rumor._id + '/comments/' + comment._id + '/upvote').success(function(data){
+      comment.upvotes += 1;
+    });
+  };
 
   return o;
 }]);
+
+app.factory('auth', ['$http', '$window', function($http, $window){
+  var auth = {};
+
+  auth.saveToken = function (token){
+    $window.localStorage['mercato-news-token'] = token;
+  };
+
+  auth.getToken = function (){
+    return $window.localStorage['mercato-news-token'];
+  };
+
+  auth.isLoggedIn = function(){
+    var token = auth.getToken();
+
+    if(token){
+      var payload = JSON.parse($window.atob(token.split('.')[1]));
+
+      return payload.exp > Date.now() / 1000;
+    } else {
+      return false;
+    }
+  };
+
+  auth.currentUser = function(){
+    if(auth.isLoggedIn()){
+      var token = auth.getToken();
+      var payload = JSON.parse($window.atob(token.split('.')[1]));
+
+      return payload.username;
+    }
+  };
+
+  auth.register = function(user){
+    return $http.post('/register', user).success(function(data){
+      auth.saveToken(data.token);
+    });
+  };
+
+  auth.logIn = function(user){
+    return $http.post('/login', user).success(function(data){
+      auth.saveToken(data.token);
+    });
+  };
+
+  auth.logOut = function(){
+    $window.localStorage.removeItem('mercato-news-token');
+  };
+
+  return auth;
+}])
 
 app.config([
   '$stateProvider',
@@ -115,11 +166,11 @@ app.config([
       url: '/rumors/{id}',
       templateUrl: '../templates/rumors.html',
       controller: 'RumorsCtrl',
-  resolve: {
-    rumor: ['$stateParams', 'rumors', function($stateParams, rumors) {
-      return rumors.get($stateParams.id);
-    }]
-  }
+      resolve: {
+        rumor: ['$stateParams', 'rumors', function($stateParams, rumors) {
+          return rumors.get($stateParams.id);
+        }]
+      }
     });
 
     $urlRouterProvider.otherwise('home')
