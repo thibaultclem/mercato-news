@@ -1,6 +1,3 @@
-<div class="page-header">
-  <h1>Mercato News</h1>
-</div>
 
 <div ng-repeat="rumor in rumors | orderBy: '-upvotes'" style="font-size:20px; margin-left:10px;">
   <span class="glyphicon glyphicon-thumbs-up" ng-click="upvoteRumor(rumor)"></span>
@@ -11,12 +8,15 @@
   <span ng-hide="rumor.link">
     {{rumor.title}}
   </span>
+  <span ng-show="rumor.author" style="font-size:15px;">
+    posted by {{rumor.author}}
+  </span>
   <span style="font-size:15px;">
-  <a class="glyphicon glyphicon-comment" href="#/rumors/{{rumor._id}}"></a>
-</span>
+    <a class="glyphicon glyphicon-comment" href="#/rumors/{{rumor._id}}"></a>
+  </span>
 </div>
 
-<form ng-submit="addRumor()" style="font-size:20px; margin-top:10px;">
+<form ng-submit="addRumor()" ng-show="isLoggedIn()" style="font-size:20px; margin-top:10px;">
   <h3>Post a new rumor</h3>
   <div class="form-group">
     <input type="text" placeholder="title" class="form-control" ng-model="title" value="">
@@ -26,3 +26,7 @@
   </div>
   <button type="submit" class="btn btn-primary">Post</button>
 </form>
+
+<div ng-hide="isLoggedIn()">
+  <h3>You need to <a href="/#/login">Log In</a> or <a href="/#/register">Sign Up</a> before you can add a post.</h3>
+</div>

@@ -5,10 +5,12 @@ var app = angular.module('mercatoNews', ['ui.router']); //ngma
 app.controller('MainCtrl', [
   '$scope',
   'rumors',
-  function($scope, rumors) { //ngdlf
+  'auth',
+  function($scope, rumors, auth) { //ngdlf
 
     $scope.test = "Hello world !"; //ngv
     $scope.rumors = rumors.rumors;
+    $scope.isLoggedIn = auth.isLoggedIn;
 
     $scope.addRumor = function() { //ngf
       if (!$scope.title || $scope.title === '') { return; }//prevent blank title post by user
@@ -31,9 +33,11 @@ app.controller('RumorsCtrl', [
   '$scope',
   'rumors',
   'rumor',
-  function ($scope, rumors, rumor) {
+  'auth',
+  function ($scope, rumors, rumor, auth) {
 
     $scope.rumor = rumor;
+    $scope.isLoggedIn = auth.isLoggedIn;
 
     $scope.addComment = function() {
       if($scope.body === '') { return; }
@@ -53,7 +57,42 @@ app.controller('RumorsCtrl', [
   }
 ]);
 
-app.factory('rumors', ['$http', function($http) {
+app.controller('AuthCtrl', [
+  '$scope',
+  '$state',
+  'auth',
+  function($scope, $state, auth){
+    $scope.user = {};
+
+    $scope.register = function(){
+      auth.register($scope.user).error(function(error){
+        $scope.error = error;
+      }).then(function(){
+        $state.go('home');
+      });
+    };
+
+    $scope.logIn = function(){
+      auth.logIn($scope.user).error(function(error){
+        $scope.error = error;
+      }).then(function(){
+        $state.go('home');
+      });
+    };
+  }
+]);
+
+app.controller('NavCtrl', [
+  '$scope',
+  'auth',
+  function($scope, auth){
+    $scope.isLoggedIn = auth.isLoggedIn;
+    $scope.currentUser = auth.currentUser;
+    $scope.logOut = auth.logOut;
+  }
+]);
+
+app.factory('rumors', ['$http', 'auth', function($http, auth) {
   var o = {
     rumors: []
   };
@@ -71,29 +110,38 @@ app.factory('rumors', ['$http', function($http) {
   };
 
   o.create = function(rumor) {
-    return $http.post('/rumors', rumor).success(function(data){
+    return $http.post('/rumors', rumor, {
+      headers: {Authorization: 'Bearer '+auth.getToken()}
+    }).success(function(data){
       o.rumors.push(data);
     });
   };
 
   o.upvote = function(rumor) {
-    return $http.put('/rumors/' + rumor._id + '/upvote').success(function(data){
+    return $http.put('/rumors/' + rumor._id + '/upvote', null, {
+      headers: {Authorization: 'Bearer '+auth.getToken()}
+    }).success(function(data){
       rumor.upvotes += 1;
     });
   };
 
   o.addComment = function(id, comment) {
-    return $http.post('/rumors/' + id + '/comments', comment);
+    return $http.post('/rumors/' + id + '/comments', comment, {
+      headers: {Authorization: 'Bearer '+auth.getToken()}
+    });
   };
 
   o.upvoteComment = function(rumor, comment) {
-    return $http.put('/rumors/' + rumor._id + '/comments/' + comment._id + '/upvote').success(function(data){
+    return $http.put('/rumors/' + rumor._id + '/comments/' + comment._id + '/upvote', null, {
+      headers: {Authorization: 'Bearer '+auth.getToken()}
+    }).success(function(data){
       comment.upvotes += 1;
     });
   };
 
   return o;
-}]);
+}
+]);
 
 app.factory('auth', ['$http', '$window', function($http, $window){
   var auth = {};
@@ -141,10 +189,12 @@ app.factory('auth', ['$http', '$window', function($http, $window){
 
   auth.logOut = function(){
     $window.localStorage.removeItem('mercato-news-token');
+
   };
 
   return auth;
-}])
+}
+]);
 
 app.config([
   '$stateProvider',
@@ -171,6 +221,26 @@ app.config([
           return rumors.get($stateParams.id);
         }]
       }
+    })
+    .state('login', {
+      url: '/login',
+      templateUrl: '../templates/login.html',
+      controller: 'AuthCtrl',
+      onEnter: ['$state', 'auth', function($state, auth){
+        if(auth.isLoggedIn()){
+          $state.go('home');
+        }
+      }]
+    })
+    .state('register', {
+      url: '/register',
+      templateUrl: '../templates/register.html',
+      controller: 'AuthCtrl',
+      onEnter: ['$state', 'auth', function($state, auth){
+        if(auth.isLoggedIn()){
+          $state.go('home');
+        }
+      }]
     });
 
     $urlRouterProvider.otherwise('home')

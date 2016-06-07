@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 //model
 var Comment = mongoose.model('Comment')
 var Rumor = mongoose.model('Rumor')
-var Rumor = mongoose.model('User')
+var User = mongoose.model('User')
 //auth
 var passport = require('passport');
 var jwt = require('express-jwt');
@@ -110,7 +110,7 @@ router.put('/rumors/:rumor/comments/:comment/upvote', auth, function(req, res, n
 });
 
 /* POST register user */
-router.post('/register', auth, function(req, res, next) {
+router.post('/register', function(req, res, next) {
 
   if(!req.body.username || !req.body.password){
     return res.status(400).json({message: 'Please fill out all fields'});
